@@ -11,12 +11,16 @@
     <title>Shopping Cart</title>
   </head>
   <body>
+    <div id="overlay"></div>
     <div class="container">
       <div class="navbar">
         <div class="menu-btn"><i class="fa-solid fa-bars fa-lg"></i></div>
         <h1 class="title">Comfy <span>House</span></h1>
         <div class="cart-btn">
-          <i class="fa-solid fa-cart-shopping fa-lg"></i>
+          <button type="button" id="cart-btn">
+            <i class="fa-solid fa-cart-shopping fa-lg"></i>
+          </button>
+          <span class="items-count hidden"></span>
         </div>
       </div>
       <div class="banner">
@@ -113,8 +117,18 @@
           </article>
         </section>
       </div>
+      <div id="cart-side-panel">
+        <div class="control-bar">
+          <i
+            id="close-cart"
+            class="fa-sharp fa-solid fa-circle-xmark fa-lg"
+          ></i>
+        </div>
+        <h3>Your shopping cart</h3>
+        <div id="cart-wrapper"></div>
+      </div>
       <div class="footer">
-        <p>Copyright &copy; Alaa Seada 2022</p>
+        <p>Copyright &copy; <strong>Alaa Seada &trade;</strong> 2022</p>
       </div>
     </div>
     <!-- Javascript code -->

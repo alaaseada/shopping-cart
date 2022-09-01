@@ -1,27 +1,196 @@
-const prod_imgs = document.querySelectorAll('.img');
-const cart_links = document.querySelectorAll('.cart-link');
-
+// Vars ========================================
+const product_cells = document.querySelectorAll('.product-cell');
+const items_count = document.querySelector('.items-count');
+const cart_btn = document.querySelector('#cart-btn');
+const cart_side_panel = document.querySelector('#cart-side-panel');
+const close_cart_btn = document.querySelector('#close-cart');
+const overlay_div = document.querySelector('#overlay');
+const cart_wrapper = document.querySelector('#cart-wrapper');
 const itemsInCart =
-  JSON.parse(localStorage.getItem('ItemsInCart')) | JSON.stringify([]);
+  localStorage.getItem('ItemsInCart') === null
+    ? []
+    : JSON.parse(localStorage.getItem('ItemsInCart'));
 
-function handleOverlay(e) {
-  const after = e.target.children[1];
-  // if (itemsInCart.after.children[0].getAttribute('id'))
-  after.classList.toggle('hidden');
+// Functions ==================================
+function updateInCartCount() {
+  if (itemsInCart.length > 0) {
+    items_count.innerText = itemsInCart.length;
+    items_count.classList.remove('hidden');
+  } else {
+    if (!items_count.classList.contains('hidden')) {
+      items_count.classList.add('hidden');
+    }
+  }
+}
+
+function showOverlay(e) {
+  // const after = e.target.children[1];
+  const after = e.target.firstElementChild.lastElementChild;
+  after.classList.add('visible');
+  after.classList.remove('hidden');
+  handleCartLink(after.children[0]);
+}
+
+function hideOverlay(e) {
+  // const after = e.target.children[1];
+  const after = e.target.firstElementChild.lastElementChild;
+  after.classList.add('hidden');
+  after.classList.remove('visible');
+  handleCartLink(after.children[0]);
+}
+
+function handleCartLink(child) {
+  if (child.classList.contains('cart-link')) {
+    const item = itemsInCart.find(
+      (item) => item.id == child.getAttribute('id')
+    );
+    if (item) {
+      const span = document.createElement('span');
+      span.id = `span-${item.id}`;
+      span.innerText = 'In Cart';
+      span.className = 'cart-span';
+      console.log(child.parentElement);
+      child.parentElement.replaceChild(span, child);
+    }
+  }
+}
+
+function handleCartSpan(id) {
+  const span = document.getElementById(`span-${id}`);
+  const link = document.createElement('a');
+  link.className = 'cart-link';
+  link.href = '#';
+  link.innerText = 'Add to cart';
+  span.parentElement.replaceChild(link, span);
 }
 
 function addToCart(e) {
   e.preventDefault();
-  const id = e.currentTarget.getAttribute('id');
-  console.log(typeof itemsInCart);
-  itemsInCart.push({ id: `product-${id}` });
-  localStorage.setItem('ItemsInCart', [...itemsInCart]);
+  if (e.target.classList.contains('cart-link')) {
+    const id = e.target.getAttribute('id');
+    const name =
+      e.target.parentElement.parentElement.nextElementSibling.innerText;
+    const price =
+      e.target.parentElement.parentElement.nextElementSibling.nextElementSibling
+        .innerText;
+    itemsInCart.push({
+      id: id,
+      name: name,
+      price: price,
+      img: `product-${id}`,
+      quantity: 1,
+    });
+    localStorage.setItem('ItemsInCart', JSON.stringify([...itemsInCart]));
+    updateInCartCount();
+    handleCartLink(e.target);
+  } else {
+    return;
+  }
 }
 
-prod_imgs.forEach((img) => {
-  img.addEventListener('mouseleave', handleOverlay);
+function fillCart() {
+  if (itemsInCart.length === 0) {
+    cart_wrapper.innerHTML = `<p class="empty"> Your cart is empty.<p>`;
+  } else {
+    cart_wrapper.innerHTML = '';
+    itemsInCart.forEach((item) => {
+      cart_wrapper.innerHTML += `
+          <div class="cart-prod">
+            <div class="left-col">
+              <div class="thumb">
+                <img class="thumb"
+                  src="images/${item.img}.jpeg"
+                />
+              </div>
+              <div class="info">
+                <p>${item.name}</p>
+                <p>${item.price}</p>
+                <a class="remove-link" data-id=${item.id} href="#">Remove</a>
+              </div>
+            </div>
+            <div class="right-col">
+              <i data-id=${item.id} class="fa-solid fa-angle-up increase"></i>
+              <p class="quantity">${item.quantity}</p>
+              <i data-id=${item.id} class="fa-solid fa-angle-down decrease"></i>
+            </div>
+          </div>
+      `;
+    });
+    cart_wrapper.innerHTML += `
+      <h4> Your total: $ ${calculate_total()}</h4>
+    `;
+  }
+}
+function showCart(e) {
+  cart_side_panel.className = 'visible';
+  overlay_div.className = 'visible';
+  fillCart();
+}
+
+function hideCart(e) {
+  cart_side_panel.className = 'hidden';
+  overlay_div.className = 'hidden';
+}
+
+function updateCart(e) {
+  e.preventDefault();
+  const event_target = e.target;
+  const id = event_target.dataset.id;
+
+  if (event_target.classList.contains('remove-link')) {
+    removeItem(id);
+    handleCartSpan(id);
+  }
+  if (event_target.classList.contains('increase')) {
+    increaseQuantity(id);
+  }
+  if (event_target.classList.contains('increase')) {
+    decreaseQuantity(id);
+  }
+}
+
+function increaseQuantity(id) {
+  const item_to_remove = Object.entries(itemsInCart).find(
+    (item) => item[1].id === id
+  );
+  // itemsInCart
+  localStorage.setItem('ItemsInCart', JSON.stringify(itemsInCart));
+}
+
+function decreaseQuantity(id) {}
+
+function removeItem(id) {
+  const item_to_remove = Object.entries(itemsInCart).find(
+    (item) => item[1].id === id
+  );
+  itemsInCart.splice(item_to_remove[0], 1);
+  localStorage.setItem('ItemsInCart', JSON.stringify(itemsInCart));
+  fillCart();
+  updateInCartCount();
+  calculate_total();
+}
+
+function calculate_total() {
+  const total = itemsInCart.reduce((total, item) => {
+    const price = parseFloat(item.price.slice(1));
+    total += price;
+    return total;
+  }, 0);
+  return total.toFixed(2);
+}
+
+updateInCartCount();
+
+// Event handlers=================================
+
+product_cells.forEach((cell) => {
+  cell.addEventListener('click', addToCart);
+  cell.addEventListener('mouseenter', showOverlay);
+  cell.addEventListener('mouseleave', hideOverlay);
 });
 
-cart_links.forEach((link) => {
-  link.addEventListener('click', addToCart);
-});
+cart_btn.addEventListener('click', showCart);
+
+close_cart_btn.addEventListener('click', hideCart);
+
+cart_wrapper.addEventListener('click', updateCart);
