@@ -47,7 +47,6 @@ function handleCartLink(child) {
       span.id = `span-${item.id}`;
       span.innerText = 'In Cart';
       span.className = 'cart-span';
-      console.log(child.parentElement);
       child.parentElement.replaceChild(span, child);
     }
   }
@@ -59,7 +58,9 @@ function handleCartSpan(id) {
   link.className = 'cart-link';
   link.href = '#';
   link.innerText = 'Add to cart';
-  span.parentElement.replaceChild(link, span);
+  if (span) {
+    span.parentElement.replaceChild(link, span);
+  }
 }
 
 function addToCart(e) {
@@ -118,6 +119,7 @@ function fillCart() {
     calculate_total();
   }
 }
+
 function showCart(e) {
   cart_side_panel.className = 'visible';
   overlay_div.className = 'visible';
@@ -175,7 +177,7 @@ function updateQuantity(id, target) {
 }
 
 function removeItem(id) {
-  const item_index = itemsInCart.findIndex((item) => item[1].id === id);
+  const item_index = itemsInCart.findIndex((item) => item.id === id);
   itemsInCart.splice(item_index, 1);
   localStorage.setItem('ItemsInCart', JSON.stringify(itemsInCart));
   fillCart();
