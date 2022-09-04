@@ -6,7 +6,7 @@ const cart_side_panel = document.querySelector('#cart-side-panel');
 const close_cart_btn = document.querySelector('#close-cart');
 const overlay_div = document.querySelector('#overlay');
 const cart_wrapper = document.querySelector('#cart-wrapper');
-const itemsInCart =
+let itemsInCart =
   localStorage.getItem('ItemsInCart') === null
     ? []
     : JSON.parse(localStorage.getItem('ItemsInCart'));
@@ -24,7 +24,6 @@ function updateInCartCount() {
 }
 
 function showOverlay(e) {
-  // const after = e.target.children[1];
   const after = e.target.firstElementChild.lastElementChild;
   after.classList.add('visible');
   after.classList.remove('hidden');
@@ -32,7 +31,6 @@ function showOverlay(e) {
 }
 
 function hideOverlay(e) {
-  // const after = e.target.children[1];
   const after = e.target.firstElementChild.lastElementChild;
   after.classList.add('hidden');
   after.classList.remove('visible');
@@ -114,11 +112,10 @@ function fillCart() {
               <i data-id=${item.id} class="fa-solid fa-angle-down decrease"></i>
             </div>
           </div>
-      `;
+          `;
     });
-    cart_wrapper.innerHTML += `
-      <h4> Your total: $ ${calculate_total()}</h4>
-    `;
+    cart_wrapper.innerHTML += `<button id="clear_all" class="btn">Clear All</button>`;
+    calculate_total();
   }
 }
 function showCart(e) {
@@ -136,34 +133,56 @@ function updateCart(e) {
   e.preventDefault();
   const event_target = e.target;
   const id = event_target.dataset.id;
+  const classList = event_target.classList;
 
-  if (event_target.classList.contains('remove-link')) {
+  if (classList.contains('remove-link')) {
     removeItem(id);
     handleCartSpan(id);
   }
-  if (event_target.classList.contains('increase')) {
-    increaseQuantity(id);
+  if (classList.contains('increase') || classList.contains('decrease')) {
+    updateQuantity(id, event_target);
+    calculate_total();
   }
-  if (event_target.classList.contains('increase')) {
-    decreaseQuantity(id);
+  if (event_target.getAttribute('id') === 'clear_all') {
+    itemsInCart = [];
+    localStorage.setItem('ItemsInCart', JSON.stringify(itemsInCart));
+    fillCart();
+    updateInCartCount();
   }
 }
 
-function increaseQuantity(id) {
-  const item_to_remove = Object.entries(itemsInCart).find(
-    (item) => item[1].id === id
-  );
-  // itemsInCart
+function updateQuantity(id, target) {
+  const item_index = itemsInCart.findIndex((item) => item.id === id);
+  let quantity_p;
+
+  if (target.classList.contains('increase')) {
+    itemsInCart[item_index].quantity += 1;
+    quantity_p = target.nextElementSibling;
+  }
+  if (target.classList.contains('decrease')) {
+    itemsInCart[item_index].quantity -= 1;
+    quantity_p = target.previousElementSibling;
+  }
+
+  if (itemsInCart[item_index].quantity <= 0) {
+    removeItem(itemsInCart[item_index].id);
+  } else {
+    localStorage.setItem('ItemsInCart', JSON.stringify(itemsInCart));
+    quantity_p.innerText = itemsInCart[item_index].quantity;
+  }
+}
+
+function decreaseQuantity(id) {
+  const item_index = itemsInCart.findIndex((item) => item.id === id);
+  itemsInCart[item_index].quantity += 1;
   localStorage.setItem('ItemsInCart', JSON.stringify(itemsInCart));
+  const p = target.nextElementSibling;
+  p.innerText = itemsInCart[item_index].quantity;
 }
-
-function decreaseQuantity(id) {}
 
 function removeItem(id) {
-  const item_to_remove = Object.entries(itemsInCart).find(
-    (item) => item[1].id === id
-  );
-  itemsInCart.splice(item_to_remove[0], 1);
+  const item_index = itemsInCart.findIndex((item) => item[1].id === id);
+  itemsInCart.splice(item_index, 1);
   localStorage.setItem('ItemsInCart', JSON.stringify(itemsInCart));
   fillCart();
   updateInCartCount();
@@ -173,10 +192,19 @@ function removeItem(id) {
 function calculate_total() {
   const total = itemsInCart.reduce((total, item) => {
     const price = parseFloat(item.price.slice(1));
-    total += price;
+    const quantity = parseInt(item.quantity);
+    total += price * quantity;
     return total;
   }, 0);
-  return total.toFixed(2);
+  let h4_total = document.getElementById('total');
+  if (h4_total) {
+    cart_wrapper.removeChild(h4_total);
+  }
+  h4_total = document.createElement('h4');
+  h4_total.id = 'total';
+  h4_total.innerText = `Your total: $ ${total.toFixed(2)}`;
+  const clear_btn = document.getElementById('clear_all');
+  cart_wrapper.insertBefore(h4_total, clear_btn);
 }
 
 updateInCartCount();
