@@ -144,10 +144,12 @@ function updateCart(e) {
     calculate_total();
   }
   if (event_target.getAttribute('id') === 'clear_all') {
+    const ids = itemsInCart.map((item) => item.id);
     itemsInCart = [];
     localStorage.setItem('ItemsInCart', JSON.stringify(itemsInCart));
     fillCart();
     updateInCartCount();
+    ids.forEach((id) => handleCartSpan(id));
   }
 }
 
@@ -172,14 +174,6 @@ function updateQuantity(id, target) {
   }
 }
 
-function decreaseQuantity(id) {
-  const item_index = itemsInCart.findIndex((item) => item.id === id);
-  itemsInCart[item_index].quantity += 1;
-  localStorage.setItem('ItemsInCart', JSON.stringify(itemsInCart));
-  const p = target.nextElementSibling;
-  p.innerText = itemsInCart[item_index].quantity;
-}
-
 function removeItem(id) {
   const item_index = itemsInCart.findIndex((item) => item[1].id === id);
   itemsInCart.splice(item_index, 1);
@@ -187,6 +181,7 @@ function removeItem(id) {
   fillCart();
   updateInCartCount();
   calculate_total();
+  handleCartSpan(id);
 }
 
 function calculate_total() {
