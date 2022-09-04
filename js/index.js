@@ -14,7 +14,10 @@ let itemsInCart =
 // Functions ==================================
 function updateInCartCount() {
   if (itemsInCart.length > 0) {
-    items_count.innerText = itemsInCart.length;
+    items_count.innerText = itemsInCart.reduce((total, item) => {
+      total += item.quantity;
+      return total;
+    }, 0);
     items_count.classList.remove('hidden');
   } else {
     if (!items_count.classList.contains('hidden')) {
@@ -175,6 +178,7 @@ function updateQuantity(id, target) {
     localStorage.setItem('ItemsInCart', JSON.stringify(itemsInCart));
     quantity_p.innerText = itemsInCart[item_index].quantity;
   }
+  updateInCartCount();
 }
 
 function removeItem(id) {
