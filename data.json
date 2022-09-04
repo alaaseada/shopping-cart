@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "name": "Queen Panel Bed",
+    "price": 10.99,
+    "image": "images/product-1.jpeg"
+  },
+  {
+    "id": 2,
+    "name": "King Panel Bed",
+    "price": 12.99,
+    "image": "images/product-2.jpeg"
+  },
+  {
+    "id": 3,
+    "name": "Single Panel Bed",
+    "price": 12.99,
+    "image": "images/product-3.jpeg"
+  },
+  {
+    "id": 4,
+    "name": "Twin Panel Bed",
+    "price": 22.99,
+    "image": "images/product-4.jpeg"
+  },
+  {
+    "id": 5,
+    "name": "Fridge",
+    "price": 68.29,
+    "image": "images/product-5.jpeg"
+  },
+  {
+    "id": 6,
+    "name": "Dresser",
+    "price": 32.99,
+    "image": "images/product-6.jpeg"
+  },
+  {
+    "id": 7,
+    "name": "Couch",
+    "price": 48.2,
+    "image": "images/product-7.jpeg"
+  },
+  {
+    "id": 8,
+    "name": "Table",
+    "price": 33.99,
+    "image": "images/product-8.jpeg"
+  },
+  {
+    "id": 9,
+    "name": "Dark Brown Dining Table",
+    "price": 60.99,
+    "image": "images/dining-table-dark-brown.jpg"
+  },
+  {
+    "id": 10,
+    "name": "Classic Couch",
+    "price": 40.6,
+    "image": "images/classic-couch.jpg"
+  },
+  {
+    "id": 11,
+    "name": "Wooden Mirror",
+    "price": 12.6,
+    "image": "images/wooden-mirror.jpg"
+  },
+  {
+    "id": 12,
+    "name": "Kitchen Table",
+    "price": 37.99,
+    "image": "images/kitchen-table.jpg"
+  }
+]
