@@ -82,6 +82,7 @@ function addToCart(e) {
     localStorage.setItem('ItemsInCart', JSON.stringify([...itemsInCart]));
     updateInCartCount();
     handleCartLink(e.target);
+    showCart();
   } else {
     return;
   }
